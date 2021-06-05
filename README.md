@@ -104,7 +104,7 @@ python -m ipykernel install --user --name=cav_model
 ```bash
 jupyter-notebook --no-browser  --port 8100 --ip IP_ADDRESS
 ```
-8. Launch **deployment_jupyter.ipynb**. Make sure you use the "cav_model" kernel (Kernel -> Change kernel -> cav_model).
+8. Launch **deployment_jupyter.ipynb**. Make sure you use the "cav_model" kernel (Kernel -> Change kernel -> cav_model) and that you activated the env beforehand.
 
 NB: to find your ip:
 
