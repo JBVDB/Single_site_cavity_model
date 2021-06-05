@@ -8,7 +8,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-__all__ = [ # public objects of that module that will be exported when from <module> import * is used on the module (overrides default _objects)
+__all__ = [
     "ResidueEnvironment",
     "ResidueEnvironmentsDataset",
     "ToTensor",
@@ -350,20 +350,20 @@ class CavityModel(torch.nn.Module):
     def _model(self):
         self.xx, self.yy, self.zz = torch.tensor(
             np.meshgrid(
-                self.lin_spacing, self.lin_spacing, self.lin_spacing, indexing="ij" # matrix indexing (classic python)
+                self.lin_spacing, self.lin_spacing, self.lin_spacing, indexing="ij"
             ),
             dtype=torch.float32,
         ).to(self.device)
 
         self.conv1 = torch.nn.Sequential(
-            torch.nn.Conv3d(6, 16, kernel_size=(3, 3, 3), padding=1), # output= [100, 16, 9, 9, 9]
+            torch.nn.Conv3d(6, 16, kernel_size=(3, 3, 3), padding=1),
             torch.nn.MaxPool3d(kernel_size=2),
             torch.nn.BatchNorm3d(16),
             torch.nn.ReLU(),
         )
 
         self.conv2 = torch.nn.Sequential(
-            torch.nn.Conv3d(16, 32, kernel_size=(3, 3, 3), padding=0), # usual: padding = round(kernel_size/2, lower), output= [100, 32, 3, 3, 3]
+            torch.nn.Conv3d(16, 32, kernel_size=(3, 3, 3), padding=0),
             torch.nn.MaxPool3d(kernel_size=2),
             torch.nn.BatchNorm3d(32),
             torch.nn.ReLU(),
@@ -376,14 +376,14 @@ class CavityModel(torch.nn.Module):
             torch.nn.Flatten(),
         )
         self.dense1 = torch.nn.Sequential(
-            torch.nn.Linear(in_features=64, out_features=128), # bachnorm filters 64 * 4 parameters of batch norm per filter
+            torch.nn.Linear(in_features=64, out_features=128),
             torch.nn.BatchNorm1d(128),
             torch.nn.ReLU(),
         )
         self.dense2 = torch.nn.Linear(in_features=128, out_features=21)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self._gaussian_blurring(x) # input =  [100, 6, 18, 18, 18]
+        x = self._gaussian_blurring(x)
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
@@ -424,52 +424,47 @@ class CavityModel(torch.nn.Module):
         for j in range(self.n_atom_types):
             mask_j = x[:, 1] == j
             atom_type_j_data = x[mask_j] # select all columns with mask
-            if atom_type_j_data.shape[0] > 0: # actually automatically broadcast!
+            if atom_type_j_data.shape[0] > 0:
             # pos.shape = n_atom_j, self.xx = (18*18*18, 1), so we end up with a 2d matrix 'density' of shape (18*18*18, n_atom_j)
                 pos = atom_type_j_data[:, 2:]
                 density = torch.exp( # compute density of each atom type per batch
                     -(
                         (torch.reshape(self.xx, [-1, 1]) - pos[:, 0]) ** 2 # self.xx (18, 1) - pos[:, 0] being all atoms j of the batch of shape (n_atom_j,), so we end up with a 2d matrix 'density' of shape (18*18*18, n_atom_j) because it broadcasts.
-                        + (torch.reshape(self.yy, [-1, 1]) - pos[:, 1]) ** 2 # nrow is unknown (torch figures out), 1 column. creates compatible view
+                        + (torch.reshape(self.yy, [-1, 1]) - pos[:, 1]) ** 2
                         + (torch.reshape(self.zz, [-1, 1]) - pos[:, 2]) ** 2
                     )
                     / (2 * self.sigma_p ** 2)
                 )
 
                 # Normalize each atom density to 1
-                density /= torch.sum(density, dim=0) # dim=0, get the total density for each voxel (we sum over all atoms, atoms being the rows)
+                density /= torch.sum(density, dim=0) # dim=0, get the total density for each voxel (sum over all atoms)
 
                 # Since column 0 of atom_type_j_data is sorted
                 # I can use a trick to detect the boundaries of environment based
                 # on the change from one value to another.
                 change_mask_j = (
-                    atom_type_j_data[:, 0][:-1] != atom_type_j_data[:, 0][1:] # when !=, that means the previous and next indexes are the limits
+                    atom_type_j_data[:, 0][:-1] != atom_type_j_data[:, 0][1:] # i.e. previous and next indexes are the limits
                 )
 
                 # Add begin and end indices
                 ranges_i = torch.cat(
                     [
                         torch.tensor([0]), # we start from 0
-                        torch.arange(atom_type_j_data.shape[0] - 1)[change_mask_j] + 1, # previous and next as mentioned above, keeps the indexes we want
-                        torch.tensor([atom_type_j_data.shape[0]]), # we must end with the last environment for sure
+                        torch.arange(atom_type_j_data.shape[0] - 1)[change_mask_j] + 1,
+                        torch.tensor([atom_type_j_data.shape[0]]),
                     ]
                 )
 
                 # Fill tensor, for each residual environment of the batch
-                for i in range(ranges_i.shape[0]): # we could have used enumerate(zip(range_i[:-1], range_i[1:])), i = the environement, j the residue type
+                for i in range(ranges_i.shape[0]):
                     if i < ranges_i.shape[0] - 1:
                         index_0, index_1 = ranges_i[i], ranges_i[i + 1]
                         fields = torch.reshape(
                             torch.sum(density[:, index_0:index_1], dim=1), # sum get density values of voxels for that residual environment!
                             [self.grid_dim, self.grid_dim, self.grid_dim],
                         )
-                        fields_torch[i, j, :, :, :] = fields # for one environment and one atom type, we have 18x18x18 meshgrid of density values gaussianly blurred, and we have therefore as many channels as there are different atom types (6)
+                        fields_torch[i, j, :, :, :] = fields # per evt's atom type: 18x18x18 meshgrid of density values gaussianly blurred. 
         return fields_torch # so we get, per residueEvt, per_atom_type(marked_as_density), xyz_coords
-
-
-# we fit an entire residual environment in one cubic mesh of (18,18,18) bins of 1 Angstrom of accuracy (5832 voxels)! that's the whole point for being able to compare it with the spherical convolutional networks that consider spherical grids! 
-# fields_torch[i, j, :, :, :] means that for all atoms of the same type in the same residual environment get the same density value!
-# shape in the end: [100, 6, 18, 18, 18] = [batch, channel(atom type), 3d mesh-grid density values based on those atoms previous coordinates]
 
 
 class DownstreamModel(torch.nn.Module):

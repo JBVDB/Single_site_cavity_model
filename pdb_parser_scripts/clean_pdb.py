@@ -8,7 +8,8 @@ from io import BytesIO, StringIO
 import Bio.PDB
 import Bio.PDB.Polypeptide
 import Bio.SeqIO
-from pdbfixer import pdbfixer
+# from pdbfixer import pdbfixer
+import pdbfixer
 import simtk
 import simtk.openmm
 import simtk.openmm.app

@@ -226,7 +226,7 @@ def _populate_dfs_with_resenvs(
                 f"{row['variant'][1:-1]}{row['variant'][0]}"
             )
             try:
-                if "symmetric" in ddg_data_key:
+                if "symmetric" in ddg_data_key: # previous site-saturation library
                     ddg_data_key_adhoc_fix = "symmetric"
                 else:
                     ddg_data_key_adhoc_fix = ddg_data_key
