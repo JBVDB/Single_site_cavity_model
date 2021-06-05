@@ -88,6 +88,8 @@ conda install -n cav_model -c omnia openmm=7.3.1 pdbfixer=1.5 -y
 conda install -n cav_model tqdm pandas=1.1 matplotlib=3.3 scipy=1.5 -y
 conda install -n cav_model -c conda-forge biopython -y
 conda install -n cav_model pytorch=1.7 torchvision -c pytorch -y
+python3 -m pip install ssbio
+conda install -n cav_model -c salilab dssp -y
 ```
 
 **The env is ready for use with shell. If use with a Jupyter-notebook:**
