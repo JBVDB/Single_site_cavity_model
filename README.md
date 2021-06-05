@@ -1,4 +1,30 @@
-# Single site cavity model: installation
+# Single site cavity model
+
+3D Convolutional Neural Network predicting the identity probability distribution for each protein residue, based on their direct structure environment.
+Beyond the identity prediction, the cavity model estimates the change of stability for any single-site mutation (&#x0394;&#x0394;G). These &#x0394;&#x0394;G values are also scaled non-linearly with a Downstream model based on site saturation libraries *Guerois* [[1]](#1) and *Mayo* [[2]](#2).
+
+This work is based on [[3]](#3). The demo implementation comes from [[4]](#4).
+
+## Models
+- **cavity_model.pt** the trained Cavity model, with dataset from [[3]](#3).
+- **ds_model_guerois.pt** and **ds_model_mayo.pt** trained Downstream models, respectively with [[1]](#1) and [[2]](#2).
+
+## Code
+
+- **cavity_model.py** contains the main cavity model and downstream model classes and data loaders.
+- **helpers.py** protected helper functions for the pipeline.
+- **pdb_parser_scripts** contains a pdb cleaning script and a parser script to extract residue environments.
+- **visualization.py** for plotting and save predictions results.
+
+For interactive use:
+- **deployment_colab.ipynb** for use with Colaboratory.
+- **deployment_jupyter.ipynb** for use with server/local Jupyter notebook.
+
+## How to use
+- Insert your raw .pdb files of interest in data/pdbs/raw.
+- Use one of two versions of the deployment notebook to get the cavity model's and the two cavity model + Downstream models' predictions.
+
+## Installation
 
 0. Clone the repository and change directory.
 
@@ -15,11 +41,11 @@ cd reduce/
 make; make install # This might give an error but provide the reduce executable in this directory
 ```
 
-## If working with Colaboratory:
+### If working with Colaboratory:
 
 2. Simply use the **deployment_colab.ipynb** notebook.
 
-## If working with Shell/Jupyter-notebook (server/local):
+### If working with Shell/Jupyter-notebook (server/local):
 
 2. Get miniconda (or Anaconda) compatible with Python3.6 in current dir.
 
@@ -86,4 +112,18 @@ NB: to find your ip:
 
 ```bash
 hostname -i | cut -f 2 -d " "
+```
 
+## References
+
+<a id="1">[1]</a> 
+https://doi.org/10.1016/s0022-2836(02)00442-4
+   
+<a id="2">[2]</a>
+https://doi.org/10.1101/484949
+
+<a id="3">[3]</a> 
+Boomsma, W & Frellsen, J 2017, Spherical convolutions and their application in molecular modelling. in Advances in Neural Information Processing Systems 30: NIPS 2017. Curran Associates, Inc., pp. 3436-3446. <https://papers.nips.cc/paper/6935-spherical-convolutions-and-their-application-in-molecular-modelling.pdf>
+
+<a id="4">[4]</a> 
+https://github.com/mahermkassem/Cavity_Model_Demo
