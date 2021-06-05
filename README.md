@@ -85,7 +85,7 @@ In case "conda activate cav_model" raises an error:
 conda activate cav_model
 
 conda install -n cav_model -c omnia openmm=7.3.1 pdbfixer=1.5 -y
-conda install -n cav_model tqdm pandas=1.1 matplotlib=3.3 -y
+conda install -n cav_model tqdm pandas=1.1 matplotlib=3.3 scipy=1.5 -y
 conda install -n cav_model -c conda-forge biopython -y
 conda install -n cav_model pytorch=1.7 torchvision -c pytorch -y
 ```
