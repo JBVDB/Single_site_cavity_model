@@ -17,7 +17,7 @@ make; make install # This might give an error but provide the reduce executable 
 
 ## If working with Colaboratory:
 
-2. Simply use the deployment_colab.ipynb notebook.
+2. Simply use the **deployment_colab.ipynb** notebook.
 
 ## If working with Shell/Jupyter-notebook (server/local):
 
@@ -78,6 +78,8 @@ python -m ipykernel install --user --name=cav_model
 ```bash
 jupyter-notebook --no-browser  --port 8100 --ip IP_ADDRESS
 ```
+8. Launch **deployment_jupyter.ipynb**.
+
 Make sure you use the "cav_model" kernel (Kernel -> Change kernel -> cav_model)
 
 NB: to find your ip:
