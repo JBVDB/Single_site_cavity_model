@@ -80,7 +80,7 @@ jupyter-notebook --no-browser  --port 8100 --ip IP_ADDRESS
 ```
 Make sure you use the "cav_model" kernel (Kernel -> Change kernel -> cav_model)
 
-ps: to find your ip:
+NB: to find your ip:
 
 ```bash
 hostname -i | cut -f 2 -d " "
