@@ -161,6 +161,10 @@ class ResidueEnvironmentsDataset(Dataset):
             atom_types_flattened = coordinate_features["atom_types_numeric"]
 
             chain_ids = coordinate_features["chain_ids"]
+            if len(chain_ids) == 1 and chain_ids[0] == " ": # no chain defined
+                chain_ids = np.array(["A"])
+                print(f"Missing chain name to prot: {npz_filenames[i]}")
+
             pdb_residue_numbers = coordinate_features["residue_numbers"]
             chain_boundary_indices = coordinate_features["chain_boundary_indices"]
 
