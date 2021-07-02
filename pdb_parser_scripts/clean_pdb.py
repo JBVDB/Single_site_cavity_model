@@ -17,7 +17,7 @@ import sys
 
 
 PDBIO = Bio.PDB.PDBIO()
-PDB_PARSER = Bio.PDB.PDBParser(PERMISSIVE=True) # when H duplicated atoms.
+PDB_PARSER = Bio.PDB.PDBParser(PERMISSIVE=0)
 
 
 class NonHetSelector(Bio.PDB.Select):
@@ -83,9 +83,9 @@ def _step_3_pdbfixer(first_model, temp3):
     fixer.findMissingResidues()
     fixer.findNonstandardResidues()
     fixer.replaceNonstandardResidues()
-    fixer.findMissingAtoms()
-    fixer.addMissingAtoms()
-    fixer.addMissingHydrogens(7.0)
+    # fixer.findMissingAtoms() # keeps making colab kernel crash if missingatoms attribute is empty
+    # fixer.addMissingAtoms()
+    # fixer.addMissingHydrogens(7.0)
     return temp3, fixer
 
 
@@ -95,7 +95,6 @@ def _step_4_fix_numbering(fixer, temp3, temp4):
     )
     temp4.flush()
     # Fix IDs manually since pdbfixer does not preserve insertion codes
-
     structure_before = PDB_PARSER.get_structure(temp3.name, temp3.name)
     structure_after = PDB_PARSER.get_structure(temp4.name, temp4.name)
     residues_before = []
