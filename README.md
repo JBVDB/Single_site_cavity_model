@@ -17,7 +17,7 @@ This work is based on [[3]](#3). The demo implementation comes from [[4]](#4).
 - **visualization.py** for plotting and save predictions results.
 
 For interactive use:
-- **deployment_colab.ipynb** for use with Colaboratory.
+ use with Colaboratory.
 - **deployment_jupyter.ipynb** for use with server/local Jupyter notebook.
 
 ## How to use
@@ -87,8 +87,7 @@ conda activate cav_model
 conda install -n cav_model -c omnia openmm=7.3.1 pdbfixer=1.5 -y
 conda install -n cav_model tqdm pandas=1.1 matplotlib=3.3 scipy=1.5 plotly=1.14 -y
 conda install -n cav_model -c conda-forge biopython -y
-conda install -n cav_model pytorch=1.7 torchvision -c pytorch -y
-python3 -m pip install ssbio
+conda install -n cav_model pytorch=1.7 -c pytorch -y
 ```
 
 **The env is ready for use with shell. If use with a Jupyter-notebook:**
